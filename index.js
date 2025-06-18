@@ -14,6 +14,7 @@ app.use(express.json())
 //pass: simpleDB2025
 const uri = "mongodb+srv://simpleDBUser:simpleDB2025@clusterofrazu.6jqzkwj.mongodb.net/?retryWrites=true&w=majority&appName=clusterOfRazu";
 
+
 const client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
@@ -29,14 +30,21 @@ async function run() {
 
 
         const database = client.db('usersDB');
-        const usersCollection = database.collection('users')
+        const usersCollection = database.collection('users');
+
+
+        app.get('/users', async (req, res) => {
+            const cursor = usersCollection.find();
+            const resutl = await cursor.toArray();
+            res.send(resutl)
+        })
 
 
         app.post('/users', async (req, res) => {
             console.log('Data in the server', req.body);
             const newUser = req.body;
             const resutl = await usersCollection.insertOne(newUser);
-            res.send(resutl)
+            res.send(resutl);
         })
 
 
