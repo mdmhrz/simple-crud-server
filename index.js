@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const cors = require('cors')
 const app = express();
 const port = process.env.PORT || 3000;
@@ -32,19 +32,28 @@ async function run() {
         const database = client.db('usersDB');
         const usersCollection = database.collection('users');
 
-
+        // Read
         app.get('/users', async (req, res) => {
             const cursor = usersCollection.find();
             const resutl = await cursor.toArray();
             res.send(resutl)
         })
 
-
+        // Create
         app.post('/users', async (req, res) => {
             console.log('Data in the server', req.body);
             const newUser = req.body;
             const resutl = await usersCollection.insertOne(newUser);
             res.send(resutl);
+        })
+
+        // Deleta
+        app.delete('/users/:id', async (req, res) => {
+            console.log(req.params);
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await usersCollection.deleteOne(query);
+            res.send(result);
         })
 
 
@@ -54,7 +63,7 @@ async function run() {
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
-        // await client.close();
+        // await client.close();node
     }
 }
 run().catch(console.dir);
